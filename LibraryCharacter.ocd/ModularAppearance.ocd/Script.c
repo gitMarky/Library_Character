@@ -48,11 +48,7 @@ func AddAppearance(int slot, skin_definition)
 	{
 		// prepare the object
 		var skin = skin_definition;
-		//var mesh_object = CreateObject(Dummy);
-		var mesh_object = skin.AttachObject ?? CreateObject(skin.GraphicsDefinition, 0, 0, NO_OWNER);
-		mesh_object->SetGraphics(skin.GraphicsName, skin.GraphicsDefinition);
-		mesh_object->Enter(lib_appearance.container);
-
+		var mesh_object = CreateMeshObject(skin);
 		var parent_bone = "skeleton_body";
 		var child_bone = "skeleton_body";
 
@@ -106,4 +102,32 @@ func AppearanceSlots()
 func assertSlot(int slot)
 {
 	if (slot < 0) FatalError(Format("Slot number must be > 0, got %d", slot));
+}
+
+func CreateMeshObject(proplist skin)
+{
+	var mesh_object = skin.AttachObject ?? CreateObject(skin.GraphicsDefinition ?? Dummy, 0, 0, NO_OWNER);
+	mesh_object->SetGraphics(skin.GraphicsName, skin.GraphicsDefinition);
+	mesh_object->Enter(lib_appearance.container);
+		
+	if (skin.MeshMaterial)
+	{
+		if (GetType(skin.MeshMaterial) == C4V_String)
+		{	
+			mesh_object->SetMeshMaterial(skin.MeshMaterial);
+		}
+		else if (GetType(skin.MeshMaterial) == C4V_Array)
+		{
+			for (var i = 0; i < GetLength(skin.MeshMaterial); ++i)
+			{
+				mesh_object->SetMeshMaterial(skin.MeshMaterial[i], i);
+			}
+		}
+		else
+		{
+			FatalError(Format("Unknown format for mesh material: %v - known: C4V_String, C4V_Array", GetType(skin.MeshMaterial)));
+		}
+	}
+	
+	return mesh_object;
 }
