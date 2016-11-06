@@ -129,5 +129,42 @@ func CreateMeshObject(proplist skin)
 		}
 	}
 	
+	mesh_object->SetColor(GetColor());
+
 	return mesh_object;
+}
+
+
+func SetColor(int color)
+{
+	ForwardToSlots(Global.SetColor, color);
+	return _inherited(color);
+}
+
+
+func SetClrModulation(int color, int overlay_id)
+{
+	ForwardToSlots(Global.SetClrModulation, color, overlay_id);
+	return _inherited(color, overlay_id, ...);
+}
+
+
+func SetObjectBlitMode(int dwNewBlitMod, int overlay_id)
+{
+	ForwardToSlots(Global.SetObjectBlitMode, dwNewBlitMod, overlay_id);
+	return _inherited(dwNewBlitMod, overlay_id, ...);
+}
+
+
+func ForwardToSlots(method, var1, var2, var3, var4, var5, var6, var7, var8, var9)
+{
+	for (var slot in AppearanceSlots())
+	{
+		if (slot == nil) continue;
+		
+		if (slot.AttachObject)
+		{
+			slot.AttachObject->Call(method, var1, var2, var3, var4, var5, var6, var7, var8, var9);
+		}
+	}
 }
