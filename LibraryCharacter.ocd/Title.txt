@@ -1,0 +1,2 @@
+DE:Bibliothek: Charaktere
+US:Library: Characters
