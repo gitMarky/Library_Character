@@ -4,23 +4,23 @@
  
  @title Modular Appearance
  @author Marky
- @version 0.1.0
  */
  
-// Was sollte das Zeug haben?
-// - Slots fuer die einzelnen Teile
-// - man kann die Slots mit einer Fallback-Grafik belegen, die angezeigt wird, wenn man nichts benutzt
-// - ein Slot zeigt entweder die aktuelle Grafik an, oder die Fallback-Grafik, falls vorhanden, oder nichts
-// - die aktuelle Grafik / Attachment-ID des Meshes sollte in einem Array gespeichert sein
-// - evtl. sollte das attachde Objekt im Array enthalten sein
-// - wenn ein Objekt attached wird, dann sollte die Mesh-Grafik in diesem Objekt abgefragt werden? Oder das Objekt fragt beim Ziel an, ob es einen Skin fuer diese Grafik hat. Wahrscheinlich ist letzteres besser. Ansonsten eben die Defaul-Grafik
-// - Prioritaet ist explizit nicht notwendig, es kann einfach nur ein Ding je Slot verwendet werden.
-// - wahrscheinlich sollte in dem Array jeweils eine Proplist enthalten sein mit {definition, attachmentID, graphicsName, mesh material usw?}
+// What is required, how should it work?
+// - Every part of the appearance has its own slot
+// - Slots should have optional fallback-graphics, in case nothing is configured
+// - Slots display, in order: 1) the current appearance, 2) the fallback appearance, 3) nothing
+// - current graphics and attachment IDs of the mesh should be saved in an array
+// - optionally, the attached object or its number should be saved in an array
+// - when an object is attached it asks the target whether it has a skin for that graphics, otherwise use the default skin
+// - no priority is required, you have 1 thing per slot
+// - maybe the array should instead contain a proplist {definition, attachmentID, graphicsName, mesh material}?
 
 static const LIB_APPEARANCE_SLOT_MAIN = 0;
 static const LIB_APPEARANCE_SLOT_SIDE = 1;
 
 local lib_appearance;
+
 
 func Construction()
 {
@@ -32,6 +32,7 @@ func Construction()
 
 	_inherited(...);
 }
+
 
 func AddAppearance(int slot, skin_definition)
 {
@@ -46,13 +47,13 @@ func AddAppearance(int slot, skin_definition)
 	}
 	else if (GetType(skin_definition) == C4V_PropList)
 	{
-		// prepare the object
+		// Prepare the object
 		var skin = skin_definition;
 		var mesh_object = CreateMeshObject(skin);
 		var parent_bone = "skeleton_body";
 		var child_bone = "skeleton_body";
 
-		// save info for local use
+		// Save info for local use
 		skin.AttachObject = mesh_object;
 		skin.AttachNr = AttachMesh(mesh_object, parent_bone, child_bone, skin.MeshTransformation ?? Trans_Identity(), skin.Flags);
 
@@ -65,6 +66,7 @@ func AddAppearance(int slot, skin_definition)
 	}
 }
 
+
 func RemoveAppearance(int slot)
 {
 	assertSlot(slot);
@@ -74,11 +76,11 @@ func RemoveAppearance(int slot)
 		FatalError(Format("Trying to remove a slot that does not exist: %d", slot));
 	}
 
-	// save definition and remove it
+	// Save definition and remove it
 	var info = AppearanceSlots()[slot];
 	AppearanceSlots()[slot] = nil;
 
-	// remove the mesh and move the object to the current position
+	// Remove the mesh and move the object to the current position
 	DetachMesh(info.AttachNr);
 	if (info.AttachObject)
 	{
@@ -89,20 +91,24 @@ func RemoveAppearance(int slot)
 	return info;
 }
 
+
 func SetDefaultAppearance(int slot)
 {
 	assertSlot(slot);
 }
+
 
 func AppearanceSlots()
 {
 	return lib_appearance.parts;
 }
 
+
 func assertSlot(int slot)
 {
 	if (slot < 0) FatalError(Format("Slot number must be > 0, got %d", slot));
 }
+
 
 func CreateMeshObject(proplist skin)
 {

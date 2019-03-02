@@ -2,14 +2,13 @@
  Prototype for skins.
 
  @author Marky
- @version 0.1.0
 */
 
 static const Skin_Definition =  
 {
-	GraphicsDefinition = nil,	// take the graphics from this definition
-	GraphicsName = nil,			// name of the graphics
-	MeshMaterial = nil,			// custom material?
-	MeshTransformation = nil,	// custom attach transform?
-	Flags = nil,				// flags for AttachMesh()
+	GraphicsDefinition = nil,	// Take the graphics from this definition
+	GraphicsName = nil,			// Name of the graphics
+	MeshMaterial = nil,			// Custom material?
+	MeshTransformation = nil,	// Custom attach transform?
+	Flags = nil,				// Flags for AttachMesh()
 };
